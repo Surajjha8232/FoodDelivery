@@ -12,39 +12,34 @@ router.get('/', (req, res) => {
 })
 
 router.post('/register', async (req, res) => {
-    const { email, phone, username, address } = req.body;
+    var { email, phone, username, address } = req.body;
     // check for missing filds
-    if (email) {
-        email = email
-    } else {
-        email = ""
-    }
     if (!phone || !username || !address) {
-        res.send({ msg: "Please enter all the fields" })
+        res.status(400).send({ msg: "Please enter all the fields" })
         return;
     };
     var user = username.charAt(0).toUpperCase() + username.slice(1);
 
     const doesUserExitsAlreay = await User.findOne({ phone });
     if (doesUserExitsAlreay) {
-        res.send({ msg: "Phone Number already exists" });
+        res.status(400).send({ msg: "Phone Number already exists" });
         return;
     };
 
     const doesUsernameExitsAlreay = await User.findOne({ username: user });
     if (doesUsernameExitsAlreay) {
-        res.send({ msg: "Username already exists" });
+        res.status(400).send({ msg: "Username already exists" });
         return;
     };
 
     // lets hash the password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // const hashedPassword = await bcrypt.hash(password, 12);
     const latestUser = new User({ email, username: user, phone, address });
 
     latestUser
         .save()
         .then(() => {
-            res.send({ msg: "Sucessfully Registered" });
+            res.status(201).send({ msg: "Sucessfully Registered" });
             return;
         })
         .catch((err) => console.log(err));
